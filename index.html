@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
-<script src="config.js?v=0ae9d16f4d"></script>
+<script src="config.js?v=8364e1797b"></script>
 <script>try { fetch(window.NN127_CAU_HINH.EXEC_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: "{\"fn\":\"ping\"}", credentials: "omit", cache: "no-store" }).catch(function () {}); } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -213,7 +213,7 @@ textarea.o-nhap { min-height: 96px; resize: vertical; line-height: 1.5; }
 .rong p { font-size: 15px; }
 
 /* ----- phiếu ----- */
-.buoc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+.buoc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
 .buoc-o { text-align: center; font-size: 12px; font-weight: 600; color: var(--phu); }
 .buoc-o::before { content: ""; display: block; height: 6px; border-radius: 3px; background: var(--vien); margin-bottom: 6px; transition: background var(--nhanh); }
 .buoc-o.xong::before, .buoc-o.dang::before { background: var(--chinh); }
@@ -291,15 +291,15 @@ textarea.o-nhap { min-height: 96px; resize: vertical; line-height: 1.5; }
 .tam-dau { display: flex; align-items: center; gap: 12px; padding: 14px 12px 12px 20px; border-bottom: 1px solid var(--vien); }
 .tam-dau h2 { font-size: 18px; font-weight: 700; flex: 1; min-width: 0; }
 .tam-than { overflow-y: auto; padding: 16px 20px; flex: 1; -webkit-overflow-scrolling: touch; }
-.tam-day { display: flex; gap: 8px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--vien); }
-.tam-day .nut { flex: 1; }
+.tam-day { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--vien); }
+.tam-day .nut { flex: 1 1 120px; }
 @media (min-width: 900px) { .nen-mo { align-items: center; } .tam-truot { border-radius: 20px; max-height: 86vh; } }
 .thong-bao-nho { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%); z-index: 60; background: var(--muc); color: var(--trang); padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: var(--bong-noi); animation: truot-len 200ms ease-out; max-width: calc(100% - 32px); display: flex; gap: 8px; align-items: center; }
 .thanh-mang { position: sticky; top: 64px; z-index: 18; display: flex; align-items: center; gap: 10px; background: var(--cd-n); color: var(--cd-c); border: 1px solid var(--cd-n); border-radius: 12px; padding: 8px 8px 8px 14px; margin-bottom: 16px; font-weight: 600; font-size: 14px; }
 .thanh-mang span { flex: 1; }
 
 /* ----- bảng tuần ----- */
-.o-dem { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.o-dem { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
 .o-dem div { background: var(--trang); border: 1px solid var(--vien); border-radius: 12px; padding: 10px 12px; box-shadow: var(--bong); }
 @media (max-width: 479px) { .o-dem { grid-template-columns: repeat(2, 1fr); } }
 .o-dem b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; line-height: 1.2; }
@@ -324,6 +324,43 @@ table.bang td.so, table.bang th.so { text-align: right; font-variant-numeric: ta
 .dong-phong { display: grid; grid-template-columns: 1fr 96px auto; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--vien); }
 .dong-phong:first-child { border-top: 0; }
 .dong-phong input { min-height: 44px; text-align: center; }
+
+/* ----- sổ tay HIỆN TẠI ----- */
+.tab-st { margin-bottom: 16px; }
+.tgb-than { padding: 8px 14px 14px; display: grid; gap: 8px; }
+.o-buoi { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 8px; }
+@media (min-width: 640px) { .tgb-than { grid-template-columns: repeat(3, minmax(0, 1fr)); } .o-buoi { grid-template-columns: 1fr; gap: 4px; } }
+.khoi-st { border-top: 1px solid var(--vien); padding: 12px 0; display: grid; gap: 8px; }
+.khoi-st:first-child { border-top: 0; padding-top: 0; }
+.khoi-st-dau { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.chon-kq { display: flex; flex-wrap: wrap; gap: 8px; }
+.chon-kq button { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--vien); background: var(--trang); font-weight: 600; font-size: 14px; }
+.chon-kq button[aria-pressed="true"][data-kq="DAT"] { background: var(--tot-n); border-color: var(--tot-c); color: var(--tot-c); }
+.chon-kq button[aria-pressed="true"][data-kq="MOT_PHAN"] { background: var(--dat-n); border-color: var(--dat-c); color: var(--dat-c); }
+.chon-kq button[aria-pressed="true"][data-kq="CHUA_DAT"] { background: var(--cd-n); border-color: var(--cd-c); color: var(--cd-c); }
+.dong-st { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; align-items: start; padding: 10px 0; border-top: 1px solid var(--vien); }
+.dong-st:first-child { border-top: 0; padding-top: 0; }
+.o-st { display: grid; gap: 8px; min-width: 0; }
+.o-st > * { min-width: 0; }
+.st-ngay { grid-template-columns: 104px minmax(0, 1fr); }
+.st-tt { grid-template-columns: minmax(0, 1fr) 104px; }
+.st-diem { grid-template-columns: minmax(0, 1fr) 84px; }
+.st-diem > select:first-child, .st-diem > .st-rong { grid-column: 1 / -1; }
+.st-tc { grid-template-columns: 104px minmax(0, 1fr); }
+.st-tc > input[inputmode="numeric"] { text-align: right; }
+.st-ve { grid-template-columns: minmax(0, 1fr); }
+.st-ve > .st-rong { grid-column: 1 / -1; }
+.o-st input[type="date"] { min-width: 0; width: 100%; display: block; }
+.o-nhan-nho { display: grid; gap: 4px; min-width: 0; }
+@media (min-width: 640px) { .st-ve > select { grid-column: auto; } .st-ve { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 640px) { .st-diem { grid-template-columns: minmax(0, 1fr) 120px 84px; } .st-diem > select:first-child { grid-column: auto; } .st-tc { grid-template-columns: 104px minmax(0, 1fr) 84px 84px; } }
+.o-st select.o-nhap, .o-st input.o-nhap { padding-left: 10px; padding-right: 10px; }
+.tieu-st { font-size: 14px; font-weight: 700; color: var(--chinh-dam); margin: 12px 0 6px; }
+.tieu-st:first-child { margin-top: 0; }
+.ds-st { margin: 0; padding-left: 18px; font-size: 15px; }
+.dong-st-xem + .dong-st-xem { margin-top: 4px; }
+details.mo-them { margin-top: 12px; }
+details.mo-them summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--chinh); }
 
 /* ----- lớp mình, thông báo, quy chế ----- */
 .ba-o-so { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -465,6 +502,6 @@ table.bang-chieu { margin: 2vw auto 0; border-collapse: separate; border-spacing
 <body>
 <div id="ung-dung"><div class="man-dang-nhap"><div class="dn-dau"><svg viewBox="0 0 64 64" class="bieu-trung" aria-hidden="true"><path d="M10 28 32 9l22 19v24a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="var(--chinh)" stroke="var(--chinh)" stroke-width="4" stroke-linejoin="round"/><path d="M5 30 32 7l27 23" fill="none" stroke="var(--vang)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="28" y="18" width="8" height="7" rx="1.5" fill="var(--vang-2)"/><text x="32" y="47" text-anchor="middle" font-size="15" font-weight="700" fill="var(--trang)" font-family="var(--chu)">12.7</text></svg><h1>Ngôi nhà 12.7</h1><p>Lớp 12.7 · năm học 2026 – 2027</p></div><div class="dn-the" aria-hidden="true"><div class="khung-cho" style="height:20px;width:40%"></div><div class="khung-cho" style="height:48px;margin-top:20px"></div><div class="khung-cho" style="height:52px;margin-top:16px"></div><div class="khung-cho" style="height:48px;margin-top:20px"></div></div><p class="dn-chan">Đang mở…</p></div></div>
 <noscript>Cần bật JavaScript để dùng Ngôi nhà 12.7.</noscript>
-<script src="app.js?v=0ae9d16f4d" defer></script>
+<script src="app.js?v=8364e1797b" defer></script>
 </body>
 </html>
