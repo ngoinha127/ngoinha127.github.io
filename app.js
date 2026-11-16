@@ -185,8 +185,17 @@
     document.querySelectorAll('.nen-mo, .chieu, .thong-bao-nho, .thanh-mang').forEach(function (x) { x.remove(); });
     document.body.classList.remove('nen-kem');
   }
-  function luuPhien(v) { try { if (v) sessionStorage.setItem(KHOA_PHIEN, v); else sessionStorage.removeItem(KHOA_PHIEN); } catch (e) { /* trình duyệt chặn bộ nhớ */ } }
-  function docPhien() { try { return sessionStorage.getItem(KHOA_PHIEN); } catch (e) { return null; } }
+  // Thẻ phiên (máy chủ giữ 7 ngày) lưu bền qua đóng, mở trình duyệt (localStorage). Xoá khi đăng xuất hoặc máy chủ báo hết phiên.
+  function luuPhien(v) {
+    try { if (v) localStorage.setItem(KHOA_PHIEN, v); else localStorage.removeItem(KHOA_PHIEN); } catch (e) { /* trình duyệt chặn bộ nhớ */ }
+    try { sessionStorage.removeItem(KHOA_PHIEN); } catch (e) { /* bản cũ lưu ở đây */ }
+  }
+  function docPhien() {
+    var v = null;
+    try { v = localStorage.getItem(KHOA_PHIEN); } catch (e) { v = null; }
+    if (!v) { try { v = sessionStorage.getItem(KHOA_PHIEN); } catch (e) { v = null; } }
+    return v;
+  }
 
   /**
    * Một lần gọi máy chủ. Hai đường truyền:
@@ -351,7 +360,8 @@
     goc.appendChild(h('div', { lop: 'man-dang-nhap' },
       h('div', { lop: 'dn-dau' }, bieuTrung(), h('h1', { chu: 'Ngôi nhà 12.7' }), h('p', { chu: 'Lớp 12.7 · năm học 2026 – 2027' }), h('div', { lop: 'dn-dai' }, daiHoaVan('dai-hoa-van'))),
       h('div', { lop: 'dn-the' }, h('h2', { chu: 'Đăng nhập' }), form),
-      h('p', { lop: 'dn-chan' }, bt('khoa'), 'Quên PIN: báo cô chủ nhiệm')));
+      h('p', { lop: 'dn-chan' }, bt('khoa'), 'Quên PIN: báo cô chủ nhiệm'),
+      h('p', { lop: 'dn-chan', kieu: { 'margin-top': '4px' } }, 'Ứng dụng giữ đăng nhập 7 ngày. Máy dùng chung: nhớ bấm Đăng xuất.')));
     setTimeout(function () { oMa.focus(); }, 50);
   }
   function dangNhap(ma, pin, nut, vungLoi, oPin) {
@@ -406,6 +416,8 @@
           vungLoi.appendChild(h('div', { lop: 'thanh-loi', role: 'alert' }, bt('canh_bao'), h('span', { chu: kq.loi }))); return;
         }
         baoNho('Đã đổi ' + tenPin + '.');
+        // Đổi PIN làm mọi thẻ phiên cũ hết hạn; máy chủ trả thẻ mới cho máy này.
+        if (kq.du_lieu && kq.du_lieu.phien) { S.phien = kq.du_lieu.phien; luuPhien(S.phien); }
         goi('hoSo').then(function (hs) { S.nd = hs; dungKhung('nha'); }).catch(xuLyLoi);
       }).catch(function () { nutCho(nut, false); vungLoi.appendChild(h('div', { lop: 'thanh-loi' }, bt('canh_bao'), h('span', { chu: 'Không kết nối được. Đợi 1 phút rồi thử lại.' }))); });
     });
@@ -473,7 +485,7 @@
     if (soTayChuaLuu()) { hoiRoiSoTay().then(function (ok) { if (ok) { S.soTay = null; dangXuatNgay(); } }); return; }
     dangXuatNgay();
   }
-  /** Đăng xuất không hỏi (tự đăng xuất sau 15 phút không thao tác). */
+  /** Đăng xuất không hỏi (đã hỏi xong, hoặc khi cần đăng xuất ngay). */
   function dangXuatNgay() {
     var p = S.phien;
     if (p) goiMot('dangXuat', {}).catch(function () {});
@@ -621,7 +633,8 @@
       var THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
       var mHn = String(d.hom_nay).match(/^(\d{4})-(\d{2})-(\d{2})/);
       var thu = mHn ? THU[new Date(Date.UTC(+mHn[1], +mHn[2] - 1, +mHn[3])).getUTCDay()] + ', ' + ngayVN(d.hom_nay) : '';
-      main.appendChild(h('div', { lop: 'chao', kieu: { 'margin-bottom': '16px' } }, h('h2', { chu: loiChao + ', ' + d.chao + '!' }), h('p', { chu: thu })));
+      main.appendChild(h('div', { lop: 'chao', kieu: { 'margin-bottom': '16px' } }, h('h2', { chu: loiChao + ', ' + d.chao + '!' }), h('p', { chu: thu }),
+        h('p', { lop: 'chu-phu', kieu: { 'margin-top': '2px' }, chu: 'Máy dùng chung: nhớ bấm Đăng xuất (Thêm > Đăng xuất).' })));
       var sinhNhatNay = d.sinh_nhat.filter(function (x) { return x.hom_nay; });
       if (sinhNhatNay.length) main.appendChild(h('div', { lop: 'sn-hom-nay' }, h('span', { lop: 'o-bieu-tuong' }, bt('banh')), h('span', { chu: 'Hôm nay sinh nhật ' + sinhNhatNay.map(function (x) { return x.ten; }).join(', ') + '. Chúc mừng sinh nhật!' })));
       var cot1 = h('div', { lop: 'cot' }), cot2 = h('div', { lop: 'cot' });
@@ -2305,11 +2318,8 @@
   // Tải lại hoặc đóng trang khi sổ tay chưa lưu: trình duyệt hỏi lại.
   window.addEventListener('beforeunload', function (e) { if (soTayChuaLuu()) { e.preventDefault(); e.returnValue = ''; } });
 
-  // ================================================================ tự đăng xuất sau 15 phút không thao tác
-  var lanCuoi = Date.now();
-  ['click', 'keydown', 'touchstart', 'input'].forEach(function (ev) { document.addEventListener(ev, function () { lanCuoi = Date.now(); }, { passive: true }); });
-  // Bảng chiếu trên tivi không ai chạm vào: không tự đăng xuất khi đang chiếu (tờ hướng dẫn dặn đăng xuất sau buổi chiếu).
-  setInterval(function () { if (S.phien && !document.querySelector('.chieu') && Date.now() - lanCuoi > 15 * 60 * 1000) { dangXuatNgay(); } }, 30000);
+  // Từ 16/11/2026 không tự đăng xuất khi không thao tác: giữ đăng nhập 7 ngày (máy chủ quyết định hạn).
+  // Máy dùng chung thì người dùng bấm Đăng xuất (màn đăng nhập và trang chủ có nhắc).
 
   // ================================================================ khởi động
   function khoiDong() {

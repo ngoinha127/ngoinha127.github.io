@@ -1,7 +1,7 @@
 // Lưu đệm VỎ ứng dụng (HTML, JS, biểu tượng) để mở nhanh. KHÔNG lưu phản hồi của máy chủ dữ liệu:
 // mọi yêu cầu POST và mọi yêu cầu sang nguồn khác (Apps Script, Google Fonts) đi thẳng ra mạng.
-var PHIEN_BAN = 'nn127-vo-271d252ed4';
-var VO = ["./","./index.html","./app.js?v=271d252ed4","./config.js?v=271d252ed4","./manifest.webmanifest","./icon-192.png","./icon-512.png","./apple-touch-icon.png","./favicon-32.png"];
+var PHIEN_BAN = 'nn127-vo-dad507fe58';
+var VO = ["./","./index.html","./app.js?v=dad507fe58","./config.js?v=dad507fe58","./manifest.webmanifest","./icon-192.png","./icon-512.png","./apple-touch-icon.png","./favicon-32.png"];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(PHIEN_BAN).then(function (c) { return c.addAll(VO); }).then(function () { return self.skipWaiting(); }));
 });
