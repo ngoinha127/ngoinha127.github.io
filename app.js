@@ -1263,6 +1263,7 @@
     var chonTuan = h('select', { lop: 'o-nhap', 'aria-label': 'Chọn tuần', kieu: { width: 'auto', 'min-width': '200px' } }, d.cac_tuan.slice().reverse().map(function (t) {
       var o = h('option', { value: t.so, chu: t.nhan + (t.da_chot ? ' (đã chốt)' : '') }); if (t.so === tuan) o.selected = true; return o;
     }));
+    chonTuan.value = String(tuan); // ô chọn luôn là tuần đang xem (máy chủ bảo đảm tuần này có trong danh sách)
     chonTuan.addEventListener('change', function () { MAN.bangtuan({ tuan: Number(chonTuan.value) }); });
     main.appendChild(h('div', { lop: 'tieu-de-man' }, h('h2', { chu: d.da_chot ? 'Tuần ' + tuan + ' đã chốt' : 'Tuần ' + tuan + ' đang mở' }), chonTuan));
     main.appendChild(h('div', { lop: 'o-dem' }, [['Chờ tổ trưởng', d.dem.da_gui], ['Chờ lớp trưởng', d.dem.tt_duyet || 0], ['Đã duyệt đủ', d.dem.da_duyet], ['Trả lại', d.dem.tra_lai], ['Chưa gửi', d.dem.chua_gui]].map(function (x) { return h('div', {}, h('b', { chu: String(x[1]) }), h('span', { chu: x[0] })); })));
@@ -1440,7 +1441,7 @@
       return;
     }
     taiMan('Sổ tay', 'soTayTuan', ts.tuan ? { tuan: ts.tuan } : {}, function (main, d) {
-      if (d.tuan.la_tuan_nay) datDem('sotay_ht', d);
+      if (!ts.tuan || d.tuan.mac_dinh) datDem('sotay_ht', d);
       veHienTai(main, d);
     }, 3, ts.tuan ? {} : { dem: 'sotay_ht', tuoi: 300 });
   };
@@ -1485,11 +1486,21 @@
     main.appendChild(h('div', { lop: 'khung-xanh', kieu: { 'margin-top': '0', 'margin-bottom': '16px' } }, bt('khien'),
       h('span', { chu: 'Cô chủ nhiệm xem được mục 1 – 5 và Về nhà (chỉ xem); trưởng phòng của em xem được Về nhà. Trong ứng dụng, chỉ em xem được thu chi và nhật ký; cô và cán bộ không có màn xem. Bạn trong lớp không xem được sổ tay của em. Sổ tay không tính vào điểm thi đua.' })));
     if (d.thieu_trang) main.appendChild(h('div', { lop: 'khung-vang', kieu: { 'margin-top': '0', 'margin-bottom': '16px' } }, bt('canh_bao'), h('span', { chu: 'Bảng tính của lớp chưa có trang sổ tay nên chưa lưu được. Báo cô chạy menu Ngôi nhà 12.7 > Cập nhật cấu trúc bảng.' })));
+    if (d.tuan.mo === false) {
+      // Chưa có tuần nào ghi được (tuần bắt đầu dùng sổ tay còn ở phía sau): giải thích, không cho gõ rồi mới báo lỗi.
+      S.soTay = null;
+      main.appendChild(h('div', { lop: 'khung-vang', kieu: { 'margin-top': '0' } }, bt('dong_ho'), h('span', { chu: (d.tuan.ly_do || 'Sổ tay chưa mở.') + ' Tuần này là tuần ' + d.tuan.tuan_nay + '. Em xem thẻ Tương lai trong lúc chờ.' })));
+      return;
+    }
+    // Tiêu đề, ô chọn tuần và tuần gửi đi khi lưu luôn là d.tuan.so (máy chủ chỉ trả tuần nằm trong khoảng ghi được).
     var chonTuan = h('select', { lop: 'o-nhap', 'aria-label': 'Chọn tuần', kieu: { width: 'auto', 'min-width': '200px', 'max-width': '100%' } }, d.cac_tuan.map(function (t) {
       var o = h('option', { value: t.so, chu: t.nhan + (t.la_tuan_nay ? ' (tuần này)' : '') }); if (t.so === d.tuan.so) o.selected = true; return o;
     }));
+    chonTuan.value = String(d.tuan.so);
     chonTuan.addEventListener('change', function () { if (!chuyenSoTay('sotay', { the: 'hientai', tuan: Number(chonTuan.value) })) chonTuan.value = d.tuan.so; });
     main.appendChild(h('div', { lop: 'tieu-de-man' }, h('h2', { chu: 'HIỆN TẠI · tuần ' + d.tuan.so }), chonTuan));
+    if (!d.tuan.la_tuan_nay && d.tuan.mac_dinh) main.appendChild(h('div', { lop: 'khung-xanh', kieu: { 'margin-top': '0', 'margin-bottom': '16px' } }, bt('lich'),
+      h('span', { chu: 'Tuần này (tuần ' + d.tuan.tuan_nay + ') chưa mở sổ tay; em đang ghi tuần ' + d.tuan.so + '.' })));
     var cot1 = h('div', { lop: 'cot' }), cot2 = h('div', { lop: 'cot' });
     var vungChep = h('div');
     main.appendChild(vungChep);
@@ -1668,7 +1679,7 @@
         ve_nha: ST.ve_nha, nhat_ky: ST.nhat_ky };
       return goi('luuSoTayTuan', g).then(function (d2) {
         ST.doi = false;
-        if (d2.tuan.la_tuan_nay) datDem('sotay_ht', d2);
+        if (d2.tuan.mac_dinh) datDem('sotay_ht', d2);
         baoNho('Đã lưu sổ tay tuần ' + d2.tuan.so + '.');
         var y = window.scrollY;
         xoaHet(main); veHienTai(main, d2); window.scrollTo(0, y);
@@ -1743,9 +1754,14 @@
     main.appendChild(h('div', { lop: 'khung-xanh', kieu: { 'margin-top': '0', 'margin-bottom': '16px' } }, bt('khien'),
       h('span', { chu: coGhi.length + '/' + d.ds.length + ' em đã ghi sổ tay tuần này. Cô chỉ xem; thu chi cá nhân của học sinh không hiện ở đây. Cán bộ lớp không xem được.' })));
     if (d.thieu_trang) main.appendChild(h('div', { lop: 'khung-vang', kieu: { 'margin-top': '0', 'margin-bottom': '16px' } }, bt('canh_bao'), h('span', { chu: 'Bảng tính chưa có trang sổ tay. Chạy menu Ngôi nhà 12.7 > Cập nhật cấu trúc bảng.' })));
+    if (d.tuan.mo === false) {
+      main.appendChild(h('div', { lop: 'khung-vang', kieu: { 'margin-top': '0' } }, bt('dong_ho'), h('span', { chu: (d.tuan.ly_do || 'Sổ tay chưa mở.') + ' Tuần này là tuần ' + d.tuan.tuan_nay + '. Đổi ô tuan_bat_dau trong trang CauHinh nếu muốn mở sớm hơn.' })));
+      return;
+    }
     var chonTuan = h('select', { lop: 'o-nhap', 'aria-label': 'Chọn tuần', kieu: { width: 'auto', 'min-width': '200px', 'max-width': '100%' } }, d.cac_tuan.map(function (t) {
       var o = h('option', { value: t.so, chu: t.nhan }); if (t.so === d.tuan.so) o.selected = true; return o;
     }));
+    chonTuan.value = String(d.tuan.so);
     chonTuan.addEventListener('change', function () { diDen('tuonglai', { the: 'hientai', tuan: Number(chonTuan.value) }); });
     main.appendChild(h('div', { lop: 'tieu-de-man' }, h('h2', { chu: 'HIỆN TẠI · tuần ' + d.tuan.so }), chonTuan));
     var locTo = 'tat_ca', nutLoc = [];
